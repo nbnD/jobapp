@@ -5,6 +5,7 @@ import com.flutterjunction.jobms.job.JobRepository;
 import com.flutterjunction.jobms.job.JobService;
 import com.flutterjunction.jobms.job.dto.JobWithCompanyDTO;
 import com.flutterjunction.jobms.job.external.Company;
+import com.flutterjunction.jobms.job.mapper.JobMapper;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,14 +40,8 @@ public class JobServiceImpl implements JobService {
     }
 
     private JobWithCompanyDTO convertToDTO(Job job) {
-//        RestTemplate restTemplate = new RestTemplate();
-        JobWithCompanyDTO jobWithCompanyDTO = new JobWithCompanyDTO();
-        jobWithCompanyDTO.setJob(job);
-
         Company company = restTemplate.getForObject("http://COMPANY-SERVICE:8081/companies/" + job.getCompanyId(), Company.class);
-        jobWithCompanyDTO.setCompany(company);
-
-        return jobWithCompanyDTO;
+        return JobMapper.mapToJobWithCompanyDto(job,company);
 
     }
 
@@ -57,8 +52,11 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Job getJobById(Long id) {
-        return jobRepository.findById(id).orElse(null);
+    public JobWithCompanyDTO getJobById(Long id) {
+
+        Job job = jobRepository.findById(id).orElse(null);
+
+        return convertToDTO(job);
     }
 
     @Override
