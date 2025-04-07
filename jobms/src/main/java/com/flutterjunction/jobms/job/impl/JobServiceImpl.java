@@ -8,6 +8,7 @@ import com.flutterjunction.jobms.job.external.Company;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -20,8 +21,10 @@ import java.util.stream.Collectors;
 @Transactional
 public class JobServiceImpl implements JobService {
 
-    private static final Logger log = LoggerFactory.getLogger(JobServiceImpl.class);
     JobRepository jobRepository;
+
+    @Autowired
+    RestTemplate restTemplate;
 
     public JobServiceImpl(JobRepository jobRepository) {
         this.jobRepository = jobRepository;
@@ -36,11 +39,11 @@ public class JobServiceImpl implements JobService {
     }
 
     private JobWithCompanyDTO convertToDTO(Job job) {
-        RestTemplate restTemplate = new RestTemplate();
+//        RestTemplate restTemplate = new RestTemplate();
         JobWithCompanyDTO jobWithCompanyDTO = new JobWithCompanyDTO();
         jobWithCompanyDTO.setJob(job);
 
-        Company company = restTemplate.getForObject("http://localhost:8081/companies/" + job.getCompanyId(), Company.class);
+        Company company = restTemplate.getForObject("http://COMPANY-SERVICE:8081/companies/" + job.getCompanyId(), Company.class);
         jobWithCompanyDTO.setCompany(company);
 
         return jobWithCompanyDTO;
